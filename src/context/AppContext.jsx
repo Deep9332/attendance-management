@@ -3,13 +3,9 @@ import { createContext, useReducer, useState, useEffect } from "react";
 // 1. Create Context
 export const AppContext = createContext();
 
-// Default student list matching the screenshot
+// Default student list
 const defaultStudents = [
   { id: 1, name: "Deep Prajapati", rollNo: "101" },
-  { id: 2, name: "Harsh Prajapati", rollNo: "102" },
-  { id: 3, name: "Jay solanki", rollNo: "103" },
-  { id: 4, name: "Alok kanojiya", rollNo: "104" },
-  { id: 5, name: "Rushi Sable", rollNo: "105" },
 ];
 
 // 2. Reducer for Students Directory
@@ -37,7 +33,14 @@ export const AppProvider = ({ children }) => {
   // Students list using useReducer with automatic migration for legacy records
   const [students, dispatchStudents] = useReducer(studentReducer, [], () => {
     const saved = localStorage.getItem("attendance_students");
-    const parsed = saved ? JSON.parse(saved) : defaultStudents;
+    let parsed = saved ? JSON.parse(saved) : defaultStudents;
+
+    // Force-reset if it contains the old list names we want to clean up
+    if (parsed.some((s) => s.name === "Harsh Prajapati" || s.name === "Jay solanki")) {
+      parsed = defaultStudents;
+      localStorage.setItem("attendance_students", JSON.stringify(defaultStudents));
+      localStorage.removeItem("attendance_db"); // Clear old date records too
+    }
 
     let needsMigration = false;
     const migrated = parsed.map((student, idx) => {
