@@ -36,7 +36,11 @@ export const AppProvider = ({ children }) => {
     let parsed = saved ? JSON.parse(saved) : defaultStudents;
 
     // Force-reset if it contains the old list names we want to clean up
-    if (parsed.some((s) => s.name === "Harsh Prajapati" || s.name === "Jay solanki")) {
+    const oldNames = [
+      "Rahul Sharma", "Priya Patel", "Amit Verma", "Sneha Reddy", "Vikram Singh",
+      "Harsh Prajapati", "Jay solanki", "Alok kanojiya", "Rushi Sable"
+    ];
+    if (parsed.some((s) => oldNames.includes(s.name))) {
       parsed = defaultStudents;
       localStorage.setItem("attendance_students", JSON.stringify(defaultStudents));
       localStorage.removeItem("attendance_db"); // Clear old date records too
