@@ -5,11 +5,11 @@ export const AppContext = createContext();
 
 // Default student list matching the screenshot
 const defaultStudents = [
-  { id: 1, name: "Rahul Sharma", rollNo: "101" },
-  { id: 2, name: "Priya Patel", rollNo: "102" },
-  { id: 3, name: "Amit Verma", rollNo: "103" },
-  { id: 4, name: "Sneha Reddy", rollNo: "104" },
-  { id: 5, name: "Vikram Singh", rollNo: "105" },
+  { id: 1, name: "Deep Prajapati", rollNo: "101" },
+  { id: 2, name: "Harsh Prajapati", rollNo: "102" },
+  { id: 3, name: "Jay solanki", rollNo: "103" },
+  { id: 4, name: "Alok kanojiya", rollNo: "104" },
+  { id: 5, name: "Rushi Sable", rollNo: "105" },
 ];
 
 // 2. Reducer for Students Directory
