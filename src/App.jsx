@@ -39,32 +39,7 @@ function AppContent() {
         <div className="header-logo" onClick={() => setCurrentPage("dashboard")}>
           🏫 AttendancePro
         </div>
-        <nav className="header-nav">
-          <button
-            className={`nav-link ${currentPage === "dashboard" ? "active" : ""}`}
-            onClick={() => setCurrentPage("dashboard")}
-          >
-            🏠 Dashboard
-          </button>
-          <button
-            className={`nav-link ${currentPage === "students" ? "active" : ""}`}
-            onClick={() => setCurrentPage("students")}
-          >
-            👨‍🎓 Students
-          </button>
-          <button
-            className={`nav-link ${currentPage === "attendance" ? "active" : ""}`}
-            onClick={() => setCurrentPage("attendance")}
-          >
-            📅 Attendance
-          </button>
-          <button
-            className={`nav-link ${currentPage === "reports" ? "active" : ""}`}
-            onClick={() => setCurrentPage("reports")}
-          >
-            📊 Reports
-          </button>
-        </nav>
+
         <div className="header-user">
           <span className="user-badge">👤 Admin</span>
           <button className="btn btn-outline btn-logout" onClick={logout}>
