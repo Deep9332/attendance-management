@@ -13,6 +13,12 @@ const studentReducer = (state, action) => {
   switch (action.type) {
     case "ADD_STUDENT":
       return [...state, action.payload];
+    case "UPDATE_STUDENT":
+      return state.map((student) =>
+        student.id === action.payload.id
+          ? { ...student, name: action.payload.name, rollNo: action.payload.rollNo }
+          : student
+      );
     case "DELETE_STUDENT":
       return state.filter((student) => student.id !== action.payload);
     default:
@@ -23,11 +29,21 @@ const studentReducer = (state, action) => {
 // 3. Provider Component
 export const AppProvider = ({ children }) => {
   // Page Navigation State
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [currentPage, setCurrentPage] = useState("login");
 
-  // User State
+  // User State: stores object { username, role } or null
   const [user, setUser] = useState(() => {
-    return localStorage.getItem("attendance_user") || null;
+    const saved = localStorage.getItem("attendance_user");
+    if (!saved) return null;
+    try {
+      const parsed = JSON.parse(saved);
+      if (typeof parsed === "object" && parsed !== null && parsed.role) {
+        return parsed;
+      }
+      return { username: saved, role: "admin" };
+    } catch {
+      return { username: saved, role: "admin" };
+    }
   });
 
   // Students list using useReducer with automatic migration for legacy records
@@ -87,15 +103,15 @@ export const AppProvider = ({ children }) => {
   // Sync User state with localStorage
   useEffect(() => {
     if (user) {
-      localStorage.setItem("attendance_user", user);
+      localStorage.setItem("attendance_user", JSON.stringify(user));
     } else {
       localStorage.removeItem("attendance_user");
     }
   }, [user]);
 
   // Actions
-  const login = (username) => {
-    setUser(username);
+  const login = (username, role = "admin") => {
+    setUser({ username, role });
     setCurrentPage("dashboard");
   };
 
@@ -111,6 +127,13 @@ export const AppProvider = ({ children }) => {
         name,
         rollNo,
       },
+    });
+  };
+
+  const updateStudent = (id, name, rollNo) => {
+    dispatchStudents({
+      type: "UPDATE_STUDENT",
+      payload: { id, name, rollNo },
     });
   };
 
@@ -136,6 +159,7 @@ export const AppProvider = ({ children }) => {
         login,
         logout,
         addStudent,
+        updateStudent,
         deleteStudent,
         saveAttendance,
       }}

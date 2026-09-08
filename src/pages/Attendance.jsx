@@ -2,7 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
 function Attendance() {
-  const { students, attendance, saveAttendance, setCurrentPage } = useContext(AppContext);
+  const { user, students, attendance, saveAttendance, setCurrentPage } = useContext(AppContext);
+  const isAdmin = user?.role === "admin";
 
   // Get today's date as default YYYY-MM-DD
   const getTodayDateString = () => {
@@ -26,6 +27,7 @@ function Attendance() {
 
   // Handle present/absent button clicks locally
   const markStatus = (studentId, status) => {
+    if (!isAdmin) return;
     setTempRecords((prev) => ({
       ...prev,
       [studentId]: status,
@@ -34,12 +36,14 @@ function Attendance() {
 
   // Save local changes to context and localStorage
   const handleSave = () => {
+    if (!isAdmin) return;
     saveAttendance(selectedDate, tempRecords);
     alert(`Attendance for ${selectedDate} saved successfully!`);
   };
 
   // Bulk Actions
   const markAllPresent = () => {
+    if (!isAdmin) return;
     const updated = {};
     students.forEach((student) => {
       updated[student.id] = "Present";
@@ -48,6 +52,7 @@ function Attendance() {
   };
 
   const markAllAbsent = () => {
+    if (!isAdmin) return;
     const updated = {};
     students.forEach((student) => {
       updated[student.id] = "Absent";
@@ -60,12 +65,19 @@ function Attendance() {
       {/* Title Header with Shortcut */}
       <div className="section-header-flex">
         <div>
-          <h2>Mark Attendance</h2>
+          <h2>{isAdmin ? "Mark Daily Attendance" : "View Attendance Records"}</h2>
         </div>
         <button className="btn btn-outline" onClick={() => setCurrentPage("dashboard")}>
           &larr; Dashboard
         </button>
       </div>
+
+      {/* Read-Only Banner for User */}
+      {!isAdmin && (
+        <div className="read-only-banner">
+          🔒 <strong>User Panel Notice:</strong> You are viewing attendance records for the selected date. Marking or saving attendance is disabled in User Panel.
+        </div>
+      )}
 
       {/* Date Selector & Bulk Actions Row */}
       <div className="attendance-controls-row">
@@ -82,14 +94,16 @@ function Attendance() {
           />
         </div>
 
-        <div className="bulk-actions-wrapper">
-          <button className="btn btn-outline btn-sm btn-bulk-present" onClick={markAllPresent}>
-            ✔️ Mark All Present
-          </button>
-          <button className="btn btn-outline btn-sm btn-bulk-absent" onClick={markAllAbsent}>
-            ❌ Mark All Absent
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="bulk-actions-wrapper">
+            <button className="btn btn-outline btn-sm btn-bulk-present" onClick={markAllPresent}>
+              ✔️ Mark All Present
+            </button>
+            <button className="btn btn-outline btn-sm btn-bulk-absent" onClick={markAllAbsent}>
+              ❌ Mark All Absent
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Attendance Sheet Table */}
@@ -100,8 +114,8 @@ function Attendance() {
               <th style={{ width: "80px" }}>S.NO</th>
               <th style={{ width: "150px" }}>ROLL NUMBER</th>
               <th>STUDENT NAME</th>
-              <th style={{ width: "200px" }}>ACTION</th>
-              <th style={{ width: "200px" }}>CURRENT STATUS</th>
+              {isAdmin && <th style={{ width: "200px" }}>ACTION</th>}
+              <th style={{ width: "200px" }}>ATTENDANCE STATUS</th>
             </tr>
           </thead>
           <tbody>
@@ -116,26 +130,28 @@ function Attendance() {
                   <td style={{ textAlign: "left", paddingLeft: "40px" }}>
                     {student.name}
                   </td>
-                  <td>
-                    <div className="action-button-group">
-                      <button
-                        className={`btn-action present ${
-                          currentStatus === "Present" ? "active" : ""
-                        }`}
-                        onClick={() => markStatus(student.id, "Present")}
-                      >
-                        Present
-                      </button>
-                      <button
-                        className={`btn-action absent ${
-                          currentStatus === "Absent" ? "active" : ""
-                        }`}
-                        onClick={() => markStatus(student.id, "Absent")}
-                      >
-                        Absent
-                      </button>
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td>
+                      <div className="action-button-group">
+                        <button
+                          className={`btn-action present ${
+                            currentStatus === "Present" ? "active" : ""
+                          }`}
+                          onClick={() => markStatus(student.id, "Present")}
+                        >
+                          Present
+                        </button>
+                        <button
+                          className={`btn-action absent ${
+                            currentStatus === "Absent" ? "active" : ""
+                          }`}
+                          onClick={() => markStatus(student.id, "Absent")}
+                        >
+                          Absent
+                        </button>
+                      </div>
+                    </td>
+                  )}
                   <td>
                     <span className={`status-badge-flat ${currentStatus.replace(" ", "-").toLowerCase()}`}>
                       {currentStatus}
@@ -146,8 +162,10 @@ function Attendance() {
             })}
             {students.length === 0 && (
               <tr>
-                <td colSpan="5" className="no-data">
-                  No students added. Go to the Students page to add students.
+                <td colSpan={isAdmin ? 5 : 4} className="no-data">
+                  {isAdmin
+                    ? "No students added. Go to the Students page to add students."
+                    : "No student attendance records available."}
                 </td>
               </tr>
             )}
@@ -155,8 +173,8 @@ function Attendance() {
         </table>
       </div>
 
-      {/* Save Button Row */}
-      {students.length > 0 && (
+      {/* Save Button Row (Admin Only) */}
+      {isAdmin && students.length > 0 && (
         <div className="save-button-row">
           <button className="btn btn-save" onClick={handleSave}>
             Save Attendance

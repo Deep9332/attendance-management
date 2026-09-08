@@ -2,7 +2,8 @@ import { useState, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
 function Reports() {
-  const { students, attendance, setCurrentPage } = useContext(AppContext);
+  const { user, students, attendance, setCurrentPage } = useContext(AppContext);
+  const isAdmin = user?.role === "admin";
   const [activeTab, setActiveTab] = useState("overall"); // "overall" or "date"
 
   // Date picker state for the "Filter by Date" tab
@@ -61,8 +62,7 @@ function Reports() {
       }
     });
 
-    // In a school tracker, the total classes for a student is the number of sessions they were marked
-    const studentTotalClasses = classesConducted; // matching screenshot where total classes is same for all
+    const studentTotalClasses = classesConducted;
     const rate = studentTotalClasses > 0 ? Math.round((presentCount / studentTotalClasses) * 100) : 0;
 
     return {
@@ -86,7 +86,7 @@ function Reports() {
       {/* Title Header with Dashboard Shortcut */}
       <div className="section-header-flex">
         <div>
-          <h2>Attendance Reports</h2>
+          <h2>Attendance Reports {isAdmin ? "(Admin View)" : "(User View)"}</h2>
         </div>
         <button className="btn btn-outline" onClick={() => setCurrentPage("dashboard")}>
           &larr; Back to Dashboard

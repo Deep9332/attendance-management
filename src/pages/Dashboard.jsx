@@ -2,7 +2,8 @@ import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
 function Dashboard() {
-  const { students, attendance, setCurrentPage } = useContext(AppContext);
+  const { user, students, attendance, setCurrentPage } = useContext(AppContext);
+  const isAdmin = user?.role === "admin";
 
   // Get today's date formatted as YYYY-MM-DD
   const getTodayDateString = () => {
@@ -30,53 +31,90 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* Dashboard Summary Hero Banner Matching Screenshot */}
-      <div className="dashboard-hero">
-        <h1>Dashboard Summary</h1>
-        <p>BCA Semester 5 Student Attendance Management Project</p>
+      {/* Dashboard Summary Hero Banner */}
+      <div className={`dashboard-hero ${isAdmin ? "hero-admin" : "hero-user"}`}>
+        <div className="hero-text-content">
+          <h1>{isAdmin ? "👑 Admin Control Panel" : "👤 User View Panel"}</h1>
+          <p>
+            {isAdmin
+              ? "Full access to add, edit, delete student records & mark attendance"
+              : "Read-only access to view student directories, attendance & reports"}
+          </p>
+        </div>
+        <div className="hero-date-badge">
+          📅 <span>{todayStr}</span>
+        </div>
       </div>
 
       {/* 3 Stats Cards Row */}
       <div className="stats-grid-dashboard">
         <div className="report-card blue-border">
-          <span>TOTAL STUDENTS</span>
+          <div className="card-header-flex">
+            <span>TOTAL STUDENTS</span>
+            <div className="card-icon-badge blue-icon">👨‍🎓</div>
+          </div>
           <h2>{totalStudents}</h2>
         </div>
+
         <div className="report-card green-border">
-          <span>PRESENT STUDENTS (TODAY)</span>
+          <div className="card-header-flex">
+            <span>PRESENT STUDENTS (TODAY)</span>
+            <div className="card-icon-badge green-icon">✅</div>
+          </div>
           <h2 style={{ color: "#10b981" }}>{presentToday}</h2>
         </div>
+
         <div className="report-card red-border">
-          <span>ABSENT STUDENTS (TODAY)</span>
+          <div className="card-header-flex">
+            <span>ABSENT STUDENTS (TODAY)</span>
+            <div className="card-icon-badge red-icon">❌</div>
+          </div>
           <h2 style={{ color: "#ef4444" }}>{absentToday}</h2>
         </div>
       </div>
 
       {/* Operations Directory section */}
-      <h3 className="operations-section-title">Operations Directory</h3>
+      <h3 className="operations-section-title">
+        {isAdmin ? "Admin Operations Directory" : "User Navigation Directory"}
+      </h3>
 
       <div className="operations-grid">
         <div className="operation-card">
-          <h3>Manage Students</h3>
-          <p>Add new student names, delete student records, and view lists.</p>
+          <div className="operation-icon">👨‍🎓</div>
+          <h3>{isAdmin ? "Manage Students" : "Student Directory"}</h3>
+          <p>
+            {isAdmin
+              ? "Add new student names, edit roll numbers, and delete records."
+              : "View the list of enrolled students and roll numbers (Read Only)."}
+          </p>
           <button className="btn-op btn-op-outline" onClick={() => setCurrentPage("students")}>
-            Go to Students
+            {isAdmin ? "Manage Students" : "View Students"}
           </button>
         </div>
 
         <div className="operation-card">
-          <h3>Daily Attendance</h3>
-          <p>Mark attendance sheets (Present / Absent toggles) for any selected date.</p>
+          <div className="operation-icon">📋</div>
+          <h3>{isAdmin ? "Daily Attendance" : "Daily Attendance Sheets"}</h3>
+          <p>
+            {isAdmin
+              ? "Mark attendance sheets (Present / Absent toggles) for any date."
+              : "View attendance records and daily status for any selected date."}
+          </p>
           <button className="btn-op btn-op-filled" onClick={() => setCurrentPage("attendance")}>
-            Mark Attendance
+            {isAdmin ? "Mark Attendance" : "View Attendance"}
           </button>
         </div>
 
         <div className="operation-card">
-          <h3>Reports & Summary</h3>
-          <p>View complete attendance ratios, tables, and total summary cards.</p>
+          <div className="operation-icon">📈</div>
+          <h3>{isAdmin ? "Reports & Summary" : "Reports & Analytics"}</h3>
+          <p>
+            {isAdmin
+              ? "View complete attendance ratios, tables, and total summary cards."
+              : "View all-time attendance rates, individual statistics, and date logs."}
+          </p>
           <button className="btn-op btn-op-outline" onClick={() => setCurrentPage("reports")}>
-            Go to Reports
+            {isAdmin ? "Go to Reports" : "View Reports"}
           </button>
         </div>
       </div>
