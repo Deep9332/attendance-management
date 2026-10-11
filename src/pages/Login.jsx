@@ -4,8 +4,6 @@ import { AppContext } from "../context/AppContext";
 function Login() {
   const { login } = useContext(AppContext);
 
-  // Empty state by default
-  const [selectedRole, setSelectedRole] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,22 +15,6 @@ function Login() {
       usernameRef.current.focus();
     }
   }, []);
-
-  // Click Admin option -> Auto-fill Admin credentials without logging in
-  const handleSelectAdmin = () => {
-    setSelectedRole("admin");
-    setUsername("admin");
-    setPassword("admin");
-    setError("");
-  };
-
-  // Click User option -> Auto-fill User credentials without logging in
-  const handleSelectUser = () => {
-    setSelectedRole("user");
-    setUsername("user");
-    setPassword("user");
-    setError("");
-  };
 
   // Manual Form Submit on clicking Login button
   const handleSubmit = (e) => {
@@ -47,16 +29,14 @@ function Login() {
       return;
     }
 
-    if (trimmedUser === "admin" && trimmedPass === "admin") {
-      login("admin", "admin");
-    } else if (trimmedUser === "user" && trimmedPass === "user") {
-      login("user", "user");
-    } else {
-      if (selectedRole === "admin") {
-        setError("Invalid Admin credentials! Use admin / admin");
+    if (trimmedUser.toLowerCase() === "admin") {
+      if (trimmedPass === "admin") {
+        login("admin", "admin");
       } else {
-        login(trimmedUser, "user");
+        setError("Invalid Admin credentials! Use admin / admin");
       }
+    } else {
+      login(trimmedUser, "user");
     }
   };
 
@@ -71,19 +51,14 @@ function Login() {
         {/* Standard Form */}
         <form onSubmit={handleSubmit}>
           <div className="form-group-soft">
-            <label htmlFor="username">
-              Username {selectedRole && <span className="role-tag-soft">({selectedRole})</span>}
-            </label>
+            <label htmlFor="username">Username</label>
             <input
               id="username"
               type="text"
               placeholder="Enter username"
               ref={usernameRef}
               value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                setSelectedRole(null);
-              }}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
@@ -95,10 +70,7 @@ function Login() {
               type="password"
               placeholder="Enter password"
               value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setSelectedRole(null);
-              }}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
@@ -107,28 +79,6 @@ function Login() {
             Login
           </button>
         </form>
-
-        {/* Role Selector Options Below Form Inputs */}
-        <div className="role-selector-divider">
-          <span>QUICK AUTO-FILL OPTIONS</span>
-        </div>
-
-        <div className="role-selector-row-soft">
-          <button
-            type="button"
-            className={`role-select-btn-soft ${selectedRole === "admin" ? "active-admin-soft" : ""}`}
-            onClick={handleSelectAdmin}
-          >
-            👑 Admin {selectedRole === "admin" && <span className="check-mark">✓</span>}
-          </button>
-          <button
-            type="button"
-            className={`role-select-btn-soft ${selectedRole === "user" ? "active-user-soft" : ""}`}
-            onClick={handleSelectUser}
-          >
-            👤 User {selectedRole === "user" && <span className="check-mark">✓</span>}
-          </button>
-        </div>
       </div>
     </div>
   );
